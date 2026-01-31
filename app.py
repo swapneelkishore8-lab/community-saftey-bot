@@ -16,8 +16,12 @@ from functools import wraps
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'community-safety-secret-key-2024')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///community_safety.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///community_safety.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300
+}
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)

@@ -59,18 +59,53 @@ To democratize cyber safety knowledge and make digital protection accessible to 
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Deployment Options
 
-### Prerequisites
-- Python 3.9 or higher
-- Google API Key for Generative AI
-- Modern web browser
+### Option 1: Deploy to Render.com (Recommended) 🌟
 
-### Installation
+1. **Create Render Account**
+   - Go to [render.com](https://render.com) and sign up
+   - Connect your GitHub account
+
+2. **Create Web Service**
+   - Click "New +" → "Web Service"
+   - Select your repository: `swapneelkishore8-lab/community-saftey-bot`
+   - Branch: `main`
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+
+3. **Configure Environment Variables**
+   - Click "Advanced" → "Add Environment Variables"
+   - Add: `GOOGLE_API_KEY` = your Google API key (required)
+   - Add: `SECRET_KEY` = generate a strong random key (optional)
+
+4. **Deploy**
+   - Click "Create Web Service"
+   - Wait for build to complete (~2-3 minutes)
+   - Your app will be live at: `https://your-service-name.onrender.com`
+
+**Admin Login:**
+- Username: `admin`
+- Password: `admin123`
+
+---
+
+### Option 2: Deploy to Vercel (Static Version)
+
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Import: `swapneelkishore8-lab/community-saftey-bot`
+3. Framework: **Other** or **Static**
+4. Deploy!
+
+> ⚠️ Note: Vercel hosts a static version. For full AI chat features, use Render.
+
+---
+
+### Option 3: Local Development
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/community-safety-bot.git
+   git clone https://github.com/swapneelkishore8-lab/community-saftey-bot.git
    cd community-safety-bot
    ```
 
@@ -91,18 +126,12 @@ To democratize cyber safety knowledge and make digital protection accessible to 
    # Edit .env and add your Google API Key
    ```
 
-5. **Initialize the database**
-   ```bash
-   python app.py
-   # Admin user will be created automatically
-   ```
-
-6. **Run the application**
+5. **Run the application**
    ```bash
    python app.py
    ```
 
-7. **Open in browser**
+6. **Open in browser**
    ```
    http://localhost:5000
    ```

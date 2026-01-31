@@ -37,3 +37,7 @@ uritemplate==4.2.0
 urllib3==2.6.3
 Werkzeug==3.1.5
 vercel-wsgi>=3.0.0
+
+# Production deployment
+gunicorn>=21.0.0
+psycopg2-binary>=2.9.0
