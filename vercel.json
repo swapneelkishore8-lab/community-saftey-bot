@@ -1,17 +1,27 @@
 {
-  "buildCommand": "python -m pip install --upgrade pip && python -m pip install -r requirements.txt",
-  "outputDirectory": "public",
-  "framework": "presets/python",
-  "installCommand": "python -m pip install -r requirements.txt",
-  "devCommand": "python app.py",
+  "buildCommand": "echo 'Static deployment - no build needed'",
+  "outputDirectory": ".",
+  "framework": "static",
   "routes": [
     {
       "src": "/static/(.*)",
       "headers": { "Cache-Control": "public, max-age=31536000" }
     },
     {
+      "src": "/templates/(.*)",
+      "headers": { "Cache-Control": "public, max-age=31536000" }
+    },
+    {
+      "src": "/(.*\\.(gif|png|jpg|jpeg|svg|css|js|ico))$",
+      "headers": { "Cache-Control": "public, max-age=31536000" }
+    },
+    {
+      "src": "/",
+      "dest": "/api/index.html"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/api/index.py"
+      "dest": "/api/index.html"
     }
   ]
 }
