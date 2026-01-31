@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Community Safety Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: #0a0a1a;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a3e 0%, #0d0d2b 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 0 10px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .sidebar-logo span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 18px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: #ffffff;
+        }
+
+        .sidebar-menu a.active {
+            border-left: 3px solid #6366f1;
+        }
+
+        .sidebar-menu a i {
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-section h4 {
+            color: #64748b;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 18px 15px;
+        }
+
+        .main-dashboard {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            color: #94a3b8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .stat-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-icon.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .stat-icon.yellow { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stat-icon.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .stat-trend.up { color: #22c55e; }
+        .stat-trend.down { color: #ef4444; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: #ffffff;
+        }
+
+        .card-header a {
+            color: #818cf8;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .action-btn i {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .action-btn span {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .recent-activity {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.check { background: linear-gradient(135deg, #10b981, #059669); }
+        .activity-icon.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .activity-icon.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .activity-icon.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+        .activity-content h4 {
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .activity-content p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .activity-time {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .emergency-numbers {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(234, 179, 8, 0.05) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .emergency-numbers h4 {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .emergency-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .emergency-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .emergency-item span {
+            color: #e2e8f0;
+        }
+
+        .emergency-item strong {
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+        .tips-section {
+            margin-top: 30px;
+        }
+
+        .tip-card {
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .tip-card h4 {
+            color: #818cf8;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tip-card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-dashboard {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <span>SafetyBot</span>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="{{ url_for('dashboard') }}" class="active">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('chat') }}">
+                        <i class="fas fa-comments"></i>
+                        Safety Chat
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('news') }}">
+                        <i class="fas fa-newspaper"></i>
+                        Cyber News
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('report') }}">
+                        <i class="fas fa-flag"></i>
+                        Report Incident
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('emergency') }}">
+                        <i class="fas fa-phone-alt"></i>
+                        Emergency
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-section">
+                <h4>Quick Actions</h4>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="{{ url_for('chat') }}?mode=misinformation">
+                            <i class="fas fa-search"></i>
+                            Check Message
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('chat') }}?mode=fraud">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Report Scam
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('emergency') }}">
+                            <i class="fas fa-ambulance"></i>
+                            Get Help
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard -->
+        <main class="main-dashboard">
+            <div class="dashboard-header">
+                <div class="welcome-section">
+                    <h1>Welcome back, {{ user.username }}! 👋</h1>
+                    <p>Here's what's happening with your community safety today.</p>
+                </div>
+                <div class="header-actions">
+                    <a href="{{ url_for('chat') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Chat
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card" data-aos="fade-up">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">127</div>
+                    <div class="stat-label">Messages Analyzed</div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 12% this week
+                    </div>
+                </div>
+
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-header">
+                        <div class="stat-icon green">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">Threats Blocked</div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 8% this week
+                    </div>
+                </div>
+
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-header">
+                        <div class="stat-icon yellow">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">Medium Risk Alerts</div>
+                    <div class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i> 5% this week
+                    </div>
+                </div>
+
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-header">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">Community Reports</div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 20% this week
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <div class="card" data-aos="fade-up">
+                    <div class="card-header">
+                        <h3>🛡️ Quick Safety Actions</h3>
+                        <a href="{{ url_for('chat') }}">View All</a>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="{{ url_for('chat') }}?mode=misinformation" class="action-btn">
+                            <i class="fas fa-search"></i>
+                            <span>Check Misinformation</span>
+                        </a>
+                        <a href="{{ url_for('chat') }}?mode=cybercrime" class="action-btn">
+                            <i class="fas fa-bug"></i>
+                            <span>Cyber Crime Help</span>
+                        </a>
+                        <a href="{{ url_for('chat') }}?mode=abuse" class="action-btn">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Abuse Awareness</span>
+                        </a>
+                        <a href="{{ url_for('chat') }}?mode=fraud" class="action-btn">
+                            <i class="fas fa-university"></i>
+                            <span>Bank Fraud Help</span>
+                        </a>
+                    </div>
+
+                    <div class="tips-section">
+                        <div class="tip-card">
+                            <h4><i class="fas fa-lightbulb"></i> Security Tip of the Day</h4>
+                            <p>Never share your OTP (One Time Password) with anyone, even if they claim to be from your bank. Banks never ask for OTPs over calls or messages.</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4><i class="fas fa-bell"></i> Recent Alert</h4>
+                            <p>New phishing campaign detected targeting UPI users. Be cautious of messages asking for KYC updates via links.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-header">
+                        <h3>📊 Recent Activity</h3>
+                    </div>
+                    
+                    <div class="emergency-numbers">
+                        <h4><i class="fas fa-phone-alt"></i> Emergency Helplines</h4>
+                        <div class="emergency-list">
+                            <div class="emergency-item">
+                                <span>Cyber Crime Helpline</span>
+                                <strong>1930</strong>
+                            </div>
+                            <div class="emergency-item">
+                                <span>Women Helpline</span>
+                                <strong>1091</strong>
+                            </div>
+                            <div class="emergency-item">
+                                <span>Police Emergency</span>
+                                <strong>112</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <div class="activity-item">
+                            <div class="activity-icon check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Low Risk Verified</h4>
+                                <p>Message verified as safe</p>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon warning">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Medium Risk Detected</h4>
+                                <p>Suspicious link found</p>
+                                <div class="activity-time">5 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon info">
+                                <i class="fas fa-info"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Safety Tip Viewed</h4>
+                                <p>OTP fraud prevention guide</p>
+                                <div class="activity-time">Yesterday</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon danger">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>High Risk Blocked</h4>
+                                <p>Phishing attempt detected</p>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loaded successfully');
+        });
+    </script>
+</body>
+</html>
+

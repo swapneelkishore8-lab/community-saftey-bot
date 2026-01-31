@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Community Safety Bot - AI-powered chatbot for misinformation detection, cybercrime reporting, and online safety">
+    <title>{% block title %}Community Safety Bot{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/images/shield-logo.svg">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <span class="logo-text">SafetyBot</span>
+            </a>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('chat') }}" class="nav-link">
+                    <i class="fas fa-comments"></i> Chat
+                </a>
+                <a href="{{ url_for('news') }}" class="nav-link">
+                    <i class="fas fa-newspaper"></i> News
+                </a>
+                <a href="{{ url_for('report') }}" class="nav-link">
+                    <i class="fas fa-flag"></i> Report
+                </a>
+                {% endif %}
+                <a href="{{ url_for('about') }}" class="nav-link">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                {% if current_user.is_authenticated %}
+                <div class="user-menu">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ current_user.username }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+                        <a href="{{ url_for('chat_history') }}">
+                            <i class="fas fa-history"></i> Chat History
+                        </a>
+                        {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin') }}">
+                            <i class="fas fa-cogs"></i> Admin Panel
+                        </a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('logout') }}" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-outline">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+                {% endif %}
+            </div>
+            
+            <button class="nav-toggle" onclick="toggleNav()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'error' else 'info-circle' }}"></i>
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Emergency Banner -->
+    <div class="emergency-banner">
+        <div class="emergency-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>In case of emergency, call <strong>1930</strong> (Cyber Crime Helpline) or visit <strong>cybercrime.gov.in</strong></span>
+            <a href="{{ url_for('emergency') }}" class="btn btn-sm btn-warning">Get Help Now</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>SafetyBot</span>
+                </div>
+                <p class="footer-desc">
+                    Empowering communities with AI-powered safety tools to fight misinformation, 
+                    cybercrime, and online threats.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="{{ url_for('about') }}">About Us</a>
+                <a href="{{ url_for('emergency') }}">Emergency Contacts</a>
+                <a href="{{ url_for('news') }}">Cyber News</a>
+                <a href="{{ url_for('report') }}">Report Incident</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <a href="#">Safety Guidelines</a>
+                <a href="#">FAQ</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Cyber Security Quotes</h4>
+                <blockquote class="security-quote">
+                    "Security is not a product, but a process."
+                    <cite>- Bruce Schneier</cite>
+                </blockquote>
+                <blockquote class="security-quote">
+                    "The only secure system is one that is powered off."
+                    <cite>- Gene Spafford</cite>
+                </blockquote>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 Community Safety Bot. All rights reserved. Made with <i class="fas fa-heart"></i> for community safety.</p>
+        </div>
+    </footer>
+
+    <!-- AOS Animation Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

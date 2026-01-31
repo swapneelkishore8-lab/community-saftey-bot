@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Community Safety Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .about-hero {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #1a1a3e 0%, #2d1f5e 50%, #1a1a3e 100%);
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-size: 3rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .about-hero p {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .mission-section {
+            padding: 100px 20px;
+            background: #0a0a1a;
+        }
+
+        .mission-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .mission-text h2 {
+            font-size: 2.2rem;
+            color: #ffffff;
+            margin-bottom: 25px;
+        }
+
+        .mission-text p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+
+        .mission-image {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 30px;
+            padding: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .features-section {
+            padding: 100px 20px;
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a1a3e 100%);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .about-feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .about-feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .about-feature-card h3 {
+            color: #ffffff;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .about-feature-card p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .stats-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #1a1a3e 0%, #2d1f5e 100%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            color: #94a3b8;
+        }
+
+        .team-section {
+            padding: 100px 20px;
+            background: #0a0a1a;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .team-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .team-card h3 {
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .team-card .role {
+            color: #818cf8;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .team-card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .cta-section {
+            padding: 100px 20px;
+            background: linear-gradient(135deg, #1a1a3e 0%, #2d1f5e 50%, #1a1a3e 100%);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        @media (max-width: 992px) {
+            .mission-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .mission-image {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- About Hero -->
+    <section class="about-hero" data-aos="fade-up">
+        <h1>🛡️ About Community Safety Bot</h1>
+        <p>Empowering communities with AI-powered tools to fight misinformation, cybercrime, and online threats</p>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="mission-content">
+            <div class="mission-text" data-aos="fade-right">
+                <h2>Our Mission</h2>
+                <p>
+                    In an increasingly digital world, misinformation and cybercrime pose significant threats 
+                    to individuals and communities. The Community Safety Bot was created to bridge the gap 
+                    between technological threats and public awareness.
+                </p>
+                <p>
+                    Our AI-powered platform provides accessible, reliable, and instant guidance to help 
+                    people identify potential threats, report cybercrime, and make informed decisions 
+                    about their digital safety.
+                </p>
+                <p>
+                    We believe that everyone deserves to feel safe online, and we're committed to 
+                    democratizing cyber safety knowledge for all.
+                </p>
+            </div>
+            <div class="mission-image" data-aos="fade-left">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="section-header" style="text-align: center; margin-bottom: 60px;" data-aos="fade-up">
+            <h2 style="color: #ffffff; font-size: 2.2rem;">What We Do</h2>
+            <p style="color: #94a3b8; font-size: 1.1rem;">Comprehensive protection for your digital life</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="about-feature-card" data-aos="fade-up">
+                <div class="about-feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Misinformation Detection</h3>
+                <p>AI-powered analysis of messages to identify potential misinformation, fake news, and suspicious content before it spreads.</p>
+            </div>
+
+            <div class="about-feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="about-feature-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h3>Cybercrime Support</h3>
+                <p>Guidance on reporting cybercrime, accessing helplines, and taking immediate action if you become a victim.</p>
+            </div>
+
+            <div class="about-feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="about-feature-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3>Safety Education</h3>
+                <p>Empowering users with knowledge about online threats, their rights, and preventive measures.</p>
+            </div>
+
+            <div class="about-feature-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="about-feature-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h3>Fraud Prevention</h3>
+                <p>Protecting users from banking fraud, OTP scams, phishing attacks, and other financial cybercrimes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item" data-aos="fade-up">
+                <h3>50K+</h3>
+                <p>Community Members</p>
+            </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                <h3>100K+</h3>
+                <p>Messages Analyzed</p>
+            </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                <h3>25K+</h3>
+                <p>Threats Detected</p>
+            </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                <h3>99.9%</h3>
+                <p>Accuracy Rate</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="section-header" style="text-align: center; margin-bottom: 60px;" data-aos="fade-up">
+            <h2 style="color: #ffffff; font-size: 2.2rem;">Meet Our Team</h2>
+            <p style="color: #94a3b8; font-size: 1.1rem;">Dedicated to making the internet a safer place</p>
+        </div>
+
+        <div class="team-grid">
+            <div class="team-card" data-aos="fade-up">
+                <div class="team-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>Safety Team</h3>
+                <p class="role">Founders & Developers</p>
+                <p>Committed to building technology that protects communities from digital threats.</p>
+            </div>
+
+            <div class="team-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="team-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>AI Research Team</h3>
+                <p class="role">Machine Learning Engineers</p>
+                <p>Developing cutting-edge AI models for threat detection and analysis.</p>
+            </div>
+
+            <div class="team-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="team-avatar">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <h3>Cyber Law Advisors</h3>
+                <p class="role">Legal Consultants</p>
+                <p>Ensuring our guidance aligns with current cyber laws and regulations.</p>
+            </div>
+
+            <div class="team-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="team-avatar">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Community Partners</h3>
+                <p class="role">NGOs & Law Enforcement</p>
+                <p>Collaborating with organizations to enhance our reach and impact.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" data-aos="fade-up">
+        <h2>Ready to Join Our Mission?</h2>
+        <p>Help us build a safer digital community. Together, we can make a difference.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus"></i> Join Now
+            </a>
+            <a href="{{ url_for('contact') }}" class="btn btn-outline btn-lg">
+                <i class="fas fa-envelope"></i> Contact Us
+            </a>
+        </div>
+    </section>
+
+    <style>
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</body>
+</html>
+

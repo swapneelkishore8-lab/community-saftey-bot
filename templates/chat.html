@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Chat - Community Safety Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 80px);
+            background: #0a0a1a;
+        }
+
+        .chat-sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #1a1a3e 0%, #0d0d2b 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-sidebar-header h3 {
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .chat-sidebar-header p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .mode-list {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .mode-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #e2e8f0;
+            text-decoration: none;
+        }
+
+        .mode-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .mode-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .mode-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .mode-icon.misinfo { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .mode-icon.cyber { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .mode-icon.abuse { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .mode-icon.fraud { background: linear-gradient(135deg, #10b981, #059669); }
+        .mode-icon.general { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+        .mode-info h4 {
+            color: #ffffff;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .mode-info p {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .current-mode-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .chat-header-info h2 {
+            color: #ffffff;
+            font-size: 1.3rem;
+        }
+
+        .chat-header-info p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .message {
+            display: flex;
+            gap: 15px;
+            max-width: 85%;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+            align-self: flex-end;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .message-content {
+            padding: 16px 22px;
+            border-radius: 20px;
+            line-height: 1.6;
+        }
+
+        .message.bot .message-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 5px;
+            color: #e2e8f0;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #ffffff;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+
+        .message.user .message-time {
+            text-align: right;
+        }
+
+        .risk-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .risk-low { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .risk-medium { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+        .risk-high { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .chat-input-area {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .chat-input-wrapper {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 5px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .chat-input-wrapper textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 15px 20px;
+            color: #ffffff;
+            font-size: 1rem;
+            resize: none;
+            height: 50px;
+            max-height: 150px;
+            line-height: 1.5;
+        }
+
+        .chat-input-wrapper textarea:focus {
+            outline: none;
+        }
+
+        .chat-input-wrapper textarea::placeholder {
+            color: #64748b;
+        }
+
+        .chat-input-actions {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+        }
+
+        .chat-input-actions button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-actions button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .send-btn {
+            width: 55px;
+            height: 55px;
+            border: none;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 18px;
+            color: #ffffff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 15px;
+            max-width: 85%;
+        }
+
+        .typing-indicator .message-avatar {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 6px;
+            padding: 20px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .typing-dots span {
+            width: 10px;
+            height: 10px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .quick-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 30px 20px;
+        }
+
+        .quick-prompt {
+            padding: 10px 18px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 25px;
+            color: #818cf8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-prompt:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        @media (max-width: 992px) {
+            .chat-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .message {
+                max-width: 95%;
+            }
+            
+            .chat-input-container {
+                flex-direction: column;
+            }
+            
+            .send-btn {
+                width: 100%;
+                border-radius: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Chat Sidebar -->
+        <aside class="chat-sidebar">
+            <div class="chat-sidebar-header">
+                <h3>🛡️ Safety Modes</h3>
+                <p>Choose a protection mode</p>
+            </div>
+            
+            <div class="mode-list">
+                <a href="#" class="mode-item active" data-mode="misinformation" onclick="selectMode('misinformation')">
+                    <div class="mode-icon misinfo">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="mode-info">
+                        <h4>Misinformation Checker</h4>
+                        <p>Analyze messages for false info</p>
+                    </div>
+                </a>
+                
+                <a href="#" class="mode-item" data-mode="cybercrime" onclick="selectMode('cybercrime')">
+                    <div class="mode-icon cyber">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <div class="mode-info">
+                        <h4>Cyber Crime Help</h4>
+                        <p>Report & get assistance</p>
+                    </div>
+                </a>
+                
+                <a href="#" class="mode-item" data-mode="abuse" onclick="selectMode('abuse')">
+                    <div class="mode-icon abuse">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="mode-info">
+                        <h4>Abuse Awareness</h4>
+                        <p>Learn about online harassment</p>
+                    </div>
+                </a>
+                
+                <a href="#" class="mode-item" data-mode="fraud" onclick="selectMode('fraud')">
+                    <div class="mode-icon fraud">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="mode-info">
+                        <h4>Bank Fraud Awareness</h4>
+                        <p>Stay safe from scams</p>
+                    </div>
+                </a>
+                
+                <a href="#" class="mode-item" data-mode="general" onclick="selectMode('general')">
+                    <div class="mode-icon general">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="mode-info">
+                        <h4>General Safety Chat</h4>
+                        <p>Ask anything about safety</p>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="current-mode-icon misinfo" id="currentModeIcon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div>
+                        <h2 id="currentModeTitle">Misinformation Risk Checker</h2>
+                        <p id="currentModeDesc">Analyze messages for potential misinformation</p>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="btn btn-outline" onclick="clearChat()">
+                        <i class="fas fa-trash-alt"></i> Clear
+                    </button>
+                    <button class="btn btn-outline" onclick="downloadChat()">
+                        <i class="fas fa-download"></i> Save
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Prompts -->
+            <div class="quick-prompts" id="quickPrompts">
+                <button class="quick-prompt" onclick="sendQuickPrompt('Is this message safe to forward?')">Is this message safe?</button>
+                <button class="quick-prompt" onclick="sendQuickPrompt('Check this URL for phishing')">Check for phishing</button>
+                <button class="quick-prompt" onclick="sendQuickPrompt('Is this bank message legitimate?')">Verify bank message</button>
+                <button class="quick-prompt" onclick="sendQuickPrompt('What are common scams?')">Common scams</button>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Hello! I'm your Community Safety Bot. 🛡️</p>
+                        <p style="margin-top: 10px;">I'm here to help you identify misinformation, report cybercrime, and stay safe from online threats.</p>
+                        <p style="margin-top: 10px;"><strong>Select a mode from the sidebar to get started, or ask me anything about:</strong></p>
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>Suspicious messages or links</li>
+                            <li>Online fraud prevention</li>
+                            <li>Cybercrime reporting</li>
+                            <li>Digital safety tips</li>
+                        </ul>
+                        <p style="margin-top: 15px;">How can I help you stay safe today?</p>
+                        <div class="message-time">Safety Bot • Now</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-area">
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Type your message here..." 
+                            rows="1"
+                            onkeydown="handleKeyDown(event)"
+                            oninput="autoResize(this)"
+                        ></textarea>
+                        <div class="chat-input-actions">
+                            <button title="Attach file">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <button title="Add emoji">
+                                <i class="far fa-smile"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <p style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 15px;">
+                    <i class="fas fa-shield-alt"></i> Your messages are encrypted and secure. 
+                    This is an awareness tool, not a replacement for official authorities in emergencies.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentMode = 'misinformation';
+        let chatHistory = [];
+
+        const modeConfig = {
+            misinformation: {
+                title: 'Misinformation Risk Checker',
+                desc: 'Analyze messages for potential misinformation',
+                icon: 'search',
+                color: 'misinfo',
+                prompts: [
+                    'Is this message safe to forward?',
+                    'Check this URL for phishing',
+                    'Verify this news article',
+                    'Is this forward authentic?'
+                ]
+            },
+            cybercrime: {
+                title: 'Cyber Crime Help & Reporting',
+                desc: 'Get guidance on cybercrime reporting',
+                icon: 'bug',
+                color: 'cyber',
+                prompts: [
+                    'How to report cybercrime?',
+                    'Someone is blackmailing me',
+                    'My account was hacked',
+                    'Report online fraud'
+                ]
+            },
+            abuse: {
+                title: 'Online Abuse Awareness',
+                desc: 'Learn about online harassment',
+                icon: 'user-shield',
+                color: 'abuse',
+                prompts: [
+                    'What is online harassment?',
+                    'Someone is threatening me',
+                    'How to report abuse?',
+                    'My rights online'
+                ]
+            },
+            fraud: {
+                title: 'Bank Fraud Awareness',
+                desc: 'Stay protected from banking scams',
+                icon: 'university',
+                color: 'fraud',
+                prompts: [
+                    'Got a suspicious OTP call',
+                    'Is this bank SMS real?',
+                    'How to avoid UPI scams?',
+                    'Fake KYC message'
+                ]
+            },
+            general: {
+                title: 'General Safety Chat',
+                desc: 'Ask anything about online safety',
+                icon: 'comments',
+                color: 'general',
+                prompts: [
+                    'Give me safety tips',
+                    'How to stay safe online?',
+                    'Password security',
+                    'Two-factor auth'
+                ]
+            }
+        };
+
+        function selectMode(mode) {
+            currentMode = mode;
+            const config = modeConfig[mode];
+            
+            // Update sidebar
+            document.querySelectorAll('.mode-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            
+            // Update header
+            const iconClass = `mode-icon ${config.color}`;
+            document.getElementById('currentModeIcon').className = `current-mode-icon ${config.color}`;
+            document.getElementById('currentModeIcon').innerHTML = `<i class="fas fa-${config.icon}"></i>`;
+            document.getElementById('currentModeTitle').textContent = config.title;
+            document.getElementById('currentModeDesc').textContent = config.desc;
+            
+            // Update quick prompts
+            const promptsContainer = document.getElementById('quickPrompts');
+            promptsContainer.innerHTML = config.prompts.map(prompt => 
+                `<button class="quick-prompt" onclick="sendQuickPrompt('${prompt}')">${prompt}</button>`
+            ).join('');
+            
+            // Add system message
+            addSystemMessage(`Switched to ${config.title}. ${config.desc}`);
+        }
+
+        function addSystemMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const systemDiv = document.createElement('div');
+            systemDiv.style.cssText = 'text-align: center; color: #64748b; font-size: 0.85rem; margin: 10px 0;';
+            systemDiv.textContent = message;
+            messagesContainer.appendChild(systemDiv);
+        }
+
+        function sendQuickPrompt(prompt) {
+            document.getElementById('messageInput').value = prompt;
+            sendMessage();
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            chatHistory.push({ role: 'user', content: message });
+            input.value = '';
+            input.style.height = '50px';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Send to API
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    mode: currentMode,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                removeTypingIndicator();
+                
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, 'bot');
+                } else {
+                    addMessage(data.response, 'bot', data.risk_level);
+                    chatHistory.push({ role: 'bot', content: data.response });
+                }
+            })
+            .catch(error => {
+                removeTypingIndicator();
+                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                console.error('Error:', error);
+            });
+        }
+
+        function addMessage(content, type, riskLevel = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            let riskBadge = '';
+            if (riskLevel && type === 'bot') {
+                const riskEmoji = riskLevel === 'high' ? '🔴' : riskLevel === 'medium' ? '🟡' : '🟢';
+                riskBadge = `<div class="risk-indicator risk-${riskLevel}">${riskEmoji} ${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} Risk</div>`;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-${type === 'bot' ? 'robot' : 'user'}"></i>
+                </div>
+                <div class="message-content">
+                    ${riskBadge}
+                    <p>${content.replace(/\n/g, '<br>')}</p>
+                    <div class="message-time">${type === 'bot' ? 'Safety Bot' : 'You'} • ${time}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function clearChat() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+                <div class="message bot">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Chat cleared! How can I help you stay safe today?</p>
+                        <div class="message-time">Safety Bot • Now</div>
+                    </div>
+                </div>
+            `;
+            chatHistory = [];
+        }
+
+        function downloadChat() {
+            let chatText = 'Community Safety Bot - Chat History\n';
+            chatText += '====================================\n\n';
+            chatText += `Date: ${new Date().toLocaleString()}\n`;
+            chatText += `Mode: ${modeConfig[currentMode].title}\n\n`;
+            chatText += 'Conversation:\n';
+            chatText += '----------------------------------\n\n';
+            
+            chatHistory.forEach(msg => {
+                chatText += `${msg.role === 'user' ? 'You' : 'Bot'}:\n${msg.content}\n\n`;
+            });
+            
+            const blob = new Blob([chatText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'safety-chat-history.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize with URL parameter
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            if (mode && modeConfig[mode]) {
+                selectMode(mode);
+            }
+        });
+    </script>
+</body>
+</html>
+

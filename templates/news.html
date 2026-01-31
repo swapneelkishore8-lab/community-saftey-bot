@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber News - Community Safety Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .news-hero {
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #1a1a3e 0%, #2d1f5e 50%, #1a1a3e 100%);
+            text-align: center;
+        }
+
+        .news-hero h1 {
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .news-hero p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .news-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        .news-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-color: transparent;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .news-image {
+            height: 200px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .news-content {
+            padding: 25px;
+        }
+
+        .news-category {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #818cf8;
+            margin-bottom: 15px;
+        }
+
+        .news-content h3 {
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .news-content p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .news-source {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .news-date {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .news-card .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: gap 0.3s ease;
+        }
+
+        .news-card .read-more:hover {
+            gap: 15px;
+        }
+
+        .alerts-section {
+            margin-top: 60px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(234, 179, 8, 0.05));
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 24px;
+            padding: 30px;
+        }
+
+        .alerts-section h3 {
+            color: #ef4444;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-item {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            margin-bottom: 15px;
+        }
+
+        .alert-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .alert-content h4 {
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .alert-content p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .alert-meta {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="news-hero">
+        <h1 data-aos="fade-up">📰 Cyber Security News</h1>
+        <p data-aos="fade-up" data-aos-delay="100">Stay updated with the latest threats, scams, and safety alerts</p>
+    </section>
+
+    <div class="news-container">
+        <div class="news-filters" data-aos="fade-up">
+            <button class="filter-btn active">All News</button>
+            <button class="filter-btn">Scams & Frauds</button>
+            <button class="filter-btn">Data Breaches</button>
+            <button class="filter-btn">Safety Tips</button>
+            <button class="filter-btn">Government Actions</button>
+        </div>
+
+        <div class="news-grid">
+            <article class="news-card" data-aos="fade-up">
+                <div class="news-image">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="news-content">
+                    <span class="news-category">🔴 High Alert</span>
+                    <h3>New UPI Phishing Campaign Targeting Banking Users</h3>
+                    <p>Security researchers have identified a sophisticated phishing campaign where fraudsters are sending fake UPI payment requests appearing to come from legitimate banks.</p>
+                    <div class="news-meta">
+                        <span class="news-source">CyberWatch</span>
+                        <span class="news-date">Jan 15, 2024</span>
+                    </div>
+                    <a href="#" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="news-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="news-image" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="news-content">
+                    <span class="news-category">🟢 Awareness</span>
+                    <h3>Government Launches National Cyber Safety Campaign</h3>
+                    <p>The Ministry of Home Affairs has launched a nationwide awareness program to educate citizens about online safety, phishing prevention, and digital hygiene.</p>
+                    <div class="news-meta">
+                        <span class="news-source">Digital India News</span>
+                        <span class="news-date">Jan 14, 2024</span>
+                    </div>
+                    <a href="#" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="news-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="news-image" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="news-content">
+                    <span class="news-category">🟡 Warning</span>
+                    <h3>Fake Job Offers on WhatsApp: New Scam Alert</h3>
+                    <p>Criminals are luring job seekers with fake work-from-home opportunities, then demanding money for "registration" or "equipment" that never arrives.</p>
+                    <div class="news-meta">
+                        <span class="news-source">Consumer Affairs</span>
+                        <span class="news-date">Jan 13, 2024</span>
+                    </div>
+                    <a href="#" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="news-card" data-aos="fade-up">
+                <div class="news-image" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="news-content">
+                    <span class="news-category">🔵 Policy</span>
+                    <h3>RBI Issues New Guidelines for UPI Fraud Prevention</h3>
+                    <p>The Reserve Bank of India has announced enhanced security measures for UPI transactions, including mandatory confirmation screens and fraud detection alerts.</p>
+                    <div class="news-meta">
+                        <span class="news-source">Finance Ministry</span>
+                        <span class="news-date">Jan 12, 2024</span>
+                    </div>
+                    <a href="#" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="news-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="news-image" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="news-content">
+                    <span class="news-category">🟣 Alert</span>
+                    <h3>Fake Banking Apps Found on Play Store</h3>
+                    <p>Google has removed several malicious apps from the Play Store that were designed to steal banking credentials. Check if you've downloaded any suspicious apps.</p>
+                    <div class="news-meta">
+                        <span class="news-source">Tech Security</span>
+                        <span class="news-date">Jan 11, 2024</span>
+                    </div>
+                    <a href="#" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="news-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="news-image" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <div class="news-content">
+                    <span class="news-category">🔴 Investigation</span>
+                    <h3>Major Data Breach Exposes Millions of User Records</h3>
+                    <p>A significant data breach has reportedly exposed personal information of millions of users across multiple platforms. Experts recommend changing passwords immediately.</p>
+                    <div class="news-meta">
+                        <span class="news-source">CyberSafe India</span>
+                        <span class="news-date">Jan 10, 2024</span>
+                    </div>
+                    <a href="#" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+        </div>
+
+        <!-- Active Alerts Section -->
+        <div class="alerts-section" data-aos="fade-up">
+            <h3><i class="fas fa-bell"></i> Active Scam Alerts</h3>
+            
+            <div class="alert-item">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <div class="alert-content">
+                    <h4>OTP Forwarding Scam on Rise</h4>
+                    <p>Fraudsters are calling victims pretending to be bank employees and asking them to forward OTPs to "verify" their account. NEVER share OTPs!</p>
+                    <div class="alert-meta">Updated: Jan 15, 2024 • Severity: High</div>
+                </div>
+            </div>
+            
+            <div class="alert-item">
+                <div class="alert-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <div class="alert-content">
+                    <h4>Fake KYC Update Messages</h4>
+                    <p>SMS messages claiming your KYC is incomplete and asking to click a link are fraudulent. Banks never send such links via SMS.</p>
+                    <div class="alert-meta">Updated: Jan 14, 2024 • Severity: Medium</div>
+                </div>
+            </div>
+            
+            <div class="alert-item">
+                <div class="alert-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <div class="alert-content">
+                    <h4>Investment Fraud via WhatsApp Groups</h4>
+                    <p>Unauthorized groups promising high returns on investments are scams. Many have lost their savings. Verify before investing.</p>
+                    <div class="alert-meta">Updated: Jan 12, 2024 • Severity: High</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
+
