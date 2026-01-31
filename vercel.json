@@ -1,11 +1,17 @@
 {
-  "buildCommand": "uv pip install -r requirements.txt --system",
+  "buildCommand": "python -m pip install --upgrade pip && python -m pip install -r requirements.txt",
   "outputDirectory": "public",
-  "framework": "flask",
-  "rewrites": [
+  "framework": "presets/python",
+  "installCommand": "python -m pip install -r requirements.txt",
+  "devCommand": "python app.py",
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/api/index.py"
+      "src": "/static/(.*)",
+      "headers": { "Cache-Control": "public, max-age=31536000" }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
     }
   ]
 }
