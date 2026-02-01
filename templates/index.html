@@ -501,13 +501,16 @@
             <div class="floating-shape"></div>
         </div>
         
-        <div class="hero-content">
-            <div class="hero-badge">
+<div class="hero-content">
+            <div class="hero-logo" data-aos="fade-up">
+                <img src="{{ url_for('static', filename='images/shield-logo.svg') }}" alt="SafetyBot Logo" width="120" height="120">
+            </div>
+            <div class="hero-badge" data-aos="fade-up" data-aos-delay="100">
                 <i class="fas fa-bolt"></i>
                 <span>AI-Powered Community Protection</span>
             </div>
             
-            <h1 data-aos="fade-up">Community Safety Bot</h1>
+            <h1 data-aos="fade-up" data-aos-delay="200">Community Safety Bot</h1>
             <p class="tagline" data-aos="fade-up" data-aos-delay="200">
                 "Your Guardian Against Digital Threats"
             </p>
@@ -707,11 +710,11 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+<footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <div class="footer-logo">
-                    <i class="fas fa-shield-halved"></i>
+                <div class="footer-logo-img">
+                    <img src="{{ url_for('static', filename='images/shield-logo.svg') }}" alt="SafetyBot Logo">
                     <span>SafetyBot</span>
                 </div>
                 <p class="footer-desc">

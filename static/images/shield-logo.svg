@@ -1,11 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
   <defs>
-    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#6366f1"/>
       <stop offset="100%" style="stop-color:#a855f7"/>
     </linearGradient>
+    <linearGradient id="lockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e"/>
+      <stop offset="100%" style="stop-color:#10b981"/>
+    </linearGradient>
   </defs>
-  <path d="M50 5 L90 20 V45 C90 70 50 95 50 95 C50 95 10 70 10 45 V20 L50 5Z" 
-        fill="url(#shieldGradient)" stroke="white" stroke-width="2"/>
-  <path d="M38 50 L47 59 L65 41" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Shield Background -->
+  <path d="M50 5 L90 20 L90 50 C90 75 50 95 50 95 C50 95 10 75 10 50 L10 20 Z" 
+        fill="url(#shieldGrad)" opacity="0.15"/>
+  <path d="M50 10 L85 23 L85 50 C85 72 50 90 50 90 C50 90 15 72 15 50 L15 23 Z" 
+        fill="none" stroke="url(#shieldGrad)" stroke-width="3"/>
+  
+  <!-- Inner Shield -->
+  <path d="M50 20 L75 30 L75 50 C75 65 50 80 50 80 C50 80 25 65 25 50 L25 30 Z" 
+        fill="url(#shieldGrad)"/>
+  
+  <!-- Lock Body -->
+  <rect x="35" y="48" width="30" height="25" rx="4" fill="white"/>
+  
+  <!-- Lock Shackle -->
+  <path d="M40 48 L40 42 C40 38 44 35 50 35 C56 35 60 38 60 42 L60 48" 
+        fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  
+  <!-- Lock Keyhole -->
+  <circle cx="50" cy="58" r="4" fill="url(#shieldGrad)"/>
+  <rect x="48" y="58" width="4" height="8" fill="url(#shieldGrad)"/>
+  
+  <!-- Checkmark -->
+  <path d="M42 65 L48 71 L60 59" fill="none" stroke="url(#lockGrad)" stroke-width="3" 
+        stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Decorative Circuit Lines -->
+  <line x1="10" y1="30" x2="20" y2="30" stroke="#6366f1" stroke-width="2" opacity="0.5"/>
+  <line x1="80" y1="30" x2="90" y2="30" stroke="#6366f1" stroke-width="2" opacity="0.5"/>
+  <circle cx="8" cy="30" r="2" fill="#a855f7" opacity="0.7"/>
+  <circle cx="92" cy="30" r="2" fill="#a855f7" opacity="0.7"/>
 </svg>

@@ -8,11 +8,12 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
-import google.generativeai as genai
+from google import genai
 import os
 import sqlite3
 from datetime import datetime
 from functools import wraps
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'community-safety-secret-key-2024')
@@ -30,7 +31,7 @@ login_manager.login_view = 'login'
 
 # Configure Google Generative AI
 GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY', 'YOUR_API_KEY_HERE')
-genai.configure(api_key=GOOGLE_API_KEY)
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 # Database Models
 class User(UserMixin, db.Model):
@@ -133,9 +134,13 @@ User's message: {user_message}
     }
     
     try:
-        model = genai.GenerativeModel('gemini-pro')
         prompt = mode_prompts.get(mode, mode_prompts['general'])
-        response = model.generate_content(prompt)
+
+        response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt
+        )
+
         return response.text
     except Exception as e:
         return f"I apologize, but I'm having trouble connecting to my AI brain right now. Please try again later. Error: {str(e)}"
