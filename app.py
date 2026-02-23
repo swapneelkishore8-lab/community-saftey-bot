@@ -26,7 +26,7 @@ GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not found. Check your .env file.")
 
-client = genai.Client(api_key=GOOGLE_API_KEY)
+genai.configure(api_key=GOOGLE_API_KEY)
 
 # --- Database Models ---
 class User(UserMixin, db.Model):
@@ -59,38 +59,34 @@ def load_user(user_id):
 # --- Robust AI Interaction Logic ---
 def get_bot_response(mode, user_message):
     prompt = f"Role: {mode} Safety Expert. User Message: {user_message}"
-    
-    # Priority list for 2026: Gemini 3 Flash is the best free-tier option
-    # Note: Using strings directly without 'models/' prefix is safer in the new SDK
+
     model_candidates = [
-        "gemini-3-flash", 
-        "gemini-2.5-flash", 
-        "gemini-2.0-flash", 
-        "gemini-1.5-flash"
+        "gemini-1.5-flash",
+        "gemini-1.5-pro"
     ]
-    
+
     for model_name in model_candidates:
         try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt
-            )
-            if response and response.text:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+
+            if response and hasattr(response, "text") and response.text:
                 return response.text
+
         except Exception as e:
-            # If 404, the model ID is wrong/retired for your region; try the next one
-            if "404" in str(e):
-                continue
-            # If 429, wait briefly for the free-tier quota to reset
             if "429" in str(e):
-                time.sleep(3)
+                time.sleep(2)
                 try:
-                    retry_res = client.models.generate_content(model=model_name, contents=prompt)
-                    return retry_res.text
-                except: continue
-            print(f"Failed with {model_name}: {e}")
-            
-    return "The AI service is temporarily unavailable. Please check your API key and connection."
+                    model = genai.GenerativeModel(model_name)
+                    retry = model.generate_content(prompt)
+                    if retry and hasattr(retry, "text"):
+                        return retry.text
+                except:
+                    pass
+            print(f"Model {model_name} failed: {e}")
+            continue
+
+    return "The AI service is temporarily busy. Please try again."
 
 # --- App Routes ---
 @app.route('/')
@@ -187,4 +183,3 @@ if __name__ == '__main__':
             db.session.commit()
     
     app.run(debug=True, host='0.0.0.0', port=5000)
-    app = Flask(__name__)
